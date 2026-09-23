@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PersonaFile v2.3.6</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#F7F6F3;--ink:#1A1A18;--ink2:#6B6B67;--ink3:#A8A8A3;--accent:#2563EB;--accent-bg:#EFF6FF;--yes-bg:#DBEAFE;--yes-fg:#1D4ED8;--no-bg:#FEE2E2;--no-fg:#B91C1C;--border:#E5E4DF;--r:12px}
+html{background:var(--bg)}
+body{font-family:sans-serif;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.screen{width:100%;max-width:480px;padding:40px 24px 48px;display:none;flex-direction:column}
+#S1{display:flex}
+h1{font-size:28px;font-weight:700;line-height:1.3;margin-bottom:16px;text-align:center}
+h1 span{color:var(--accent)}
+.sub{font-size:14px;color:var(--ink2);line-height:1.8;margin-bottom:28px;text-align:center}
+.steps{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.step{display:flex;gap:12px;background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.snum{font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-bg);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stxt{font-size:13px;line-height:1.6}
+.stxt b{display:block;margin-bottom:2px}
+.btn{width:100%;padding:16px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;border:none;border-radius:var(--r);cursor:pointer}
+.btn:active{opacity:.8}
+.chips{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.chip{background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;text-align:left;font-size:14px;width:100%}
+.chip.sel{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+.chip b{display:block;font-weight:700;margin-bottom:2px}
+.chip small{font-size:12px;color:var(--ink3)}
+.chip.sel small{color:var(--accent)}
+.nlabel{font-size:13px;color:var(--ink2);display:block;margin-bottom:8px;font-weight:500}
+.ninput{width:100%;padding:12px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--ink);outline:none;margin-bottom:16px}
+.pr{display:flex;justify-content:space-between;margin-bottom:8px}
+.pl{font-size:12px;color:var(--ink3)}
+.pbg{height:3px;background:var(--border);border-radius:2px;margin-bottom:6px}
+.pfill{height:3px;background:var(--accent);border-radius:2px;transition:width .3s;width:0%}
+.badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;display:inline-block;margin-bottom:16px}
+.qaxis{font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:8px}
+.qtext{font-size:19px;font-weight:700;line-height:1.55;margin-bottom:24px;min-height:64px}
+.brow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.byes{padding:18px 12px;font-size:16px;font-weight:700;border-radius:var(--r);border:2px solid #BFDBFE;background:var(--yes-bg);color:var(--yes-fg);cursor:pointer}
+.bno{padding:18px 12px;font-size:16px;font-weight:700;border-radius:var(--r);border:2px solid #FECACA;background:var(--no-bg);color:var(--no-fg);cursor:pointer}
+.bback{background:none;border:none;font-size:13px;color:var(--ink3);cursor:pointer;padding:8px;width:100%}
+.rbadge{font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+.rtype{font-size:20px;font-weight:700;line-height:1.35;margin-bottom:8px}
+.rsub{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:16px}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px}
+.tchip{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink2)}
+.tchip b{display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:2px}
+.prev{background:#F1F0EB;border-radius:var(--r);padding:12px;font-size:10px;color:var(--ink2);line-height:1.7;white-space:pre-wrap;margin-bottom:16px;max-height:160px;overflow-y:auto;font-family:monospace}
+.bcopy{width:100%;padding:16px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;border:none;border-radius:var(--r);cursor:pointer;margin-bottom:8px}
+.cdone{display:none;text-align:center;font-size:13px;color:#166534;padding:8px;font-weight:500}
+.nexts{display:none;margin-top:12px}
+.nexts-inner{background:#DCFCE7;border-radius:var(--r);padding:12px;margin-bottom:10px}
+.nexts-t{font-size:13px;font-weight:500;color:#166534;margin-bottom:3px}
+.nexts-s{font-size:12px;color:#166534}
+.nsteps{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:12px}
+.nsteps-t{font-size:13px;font-weight:500;margin-bottom:8px}
+.nsi{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.nsinum{background:var(--accent-bg);color:var(--accent);font-size:11px;font-weight:600;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.nsitxt{font-size:12px;color:var(--ink2);line-height:1.6}
+.nsnote{font-size:11px;color:var(--ink3);margin-top:6px}
+.bdis{width:100%;padding:13px;background:none;color:var(--ink3);font-size:13px;border:1px solid var(--border);border-radius:var(--r);cursor:not-allowed;margin-top:8px;opacity:.5}
+.brst{width:100%;padding:13px;background:none;color:var(--ink3);font-size:14px;border:1px solid var(--border);border-radius:var(--r);cursor:pointer;margin-top:8px}
+.footer{font-size:12px;color:var(--ink3);text-align:center;padding:16px 24px 32px}
+.ov{background:#DBEAFE;color:#1D4ED8}
+.ot{background:#EDE9FE;color:#5B21B6}
+.oc{background:#D1FAE5;color:#065F46}
+.oa{background:#FEF3C7;color:#92400E}
+.oe{background:#FFE4E6;color:#9F1239}
+</style>
+</head>
+<body>
+
+<div id="S1" class="screen">
+  <p style="font-size:11px;font-weight:600;letter-spacing:.12em;color:#A8A8A3;margin-bottom:10px;text-align:center;text-transform:uppercase">PersonaFile</p>
+  <h1 style="font-size:32px;font-weight:700;line-height:1.3;margin-bottom:6px;text-align:center;color:#1A1A18">思考を紐解く。<br><span style="color:#2563EB">そして再現する。</span></h1>
+  <p style="font-size:12px;color:#6B6B67;line-height:1.6;margin-bottom:10px;text-align:center">15の質問に答えるだけで、あなたの思考スタイルを<br>AIに渡せるコンテキストファイルとして生成します。</p>
+
+  <div style="margin-bottom:10px;width:100%">
+  <svg width="100%" viewBox="0 0 380 200" role="img" style="display:block">
+    <title>PersonaFileの仕組み</title>
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+    <!-- 思考 x=4 w=40 -->
+    <rect x="4" y="10" width="40" height="180" rx="10" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/>
+    <text font-size="20" font-weight="500" x="24" y="76" text-anchor="middle" dominant-baseline="central" fill="#712B13">思考</text>
+    <text font-size="11" x="24" y="100" text-anchor="middle" dominant-baseline="central" fill="#993C1D">を</text>
+    <text font-size="11" x="24" y="116" text-anchor="middle" dominant-baseline="central" fill="#993C1D">紐解く</text>
+
+    <line x1="46" y1="100" x2="58" y2="100" stroke="#444441" stroke-width="1.5" marker-end="url(#arr)" fill="none"/>
+
+    <!-- 5因数 x=60 w=252 中心x=186 -->
+    <rect x="60" y="10" width="252" height="180" rx="12" fill="#F1F0EB" stroke="#888780" stroke-width="0.5"/>
+    <text font-size="22" font-weight="500" x="186" y="30" text-anchor="middle" dominant-baseline="central" fill="#2C2C2A">5</text>
+    <text font-size="11" x="186" y="49" text-anchor="middle" dominant-baseline="central" fill="#5F5E5A">つの因数</text>
+    <text font-size="11" x="186" y="65" text-anchor="middle" dominant-baseline="central" fill="#888780">価値観·思考·伝達·行動·感情</text>
+
+    <!-- 52軸 w=110 x=71 中心x=126 -->
+    <rect x="71" y="78" width="110" height="62" rx="8" fill="#EEEDFE" stroke="#7F77DD" stroke-width="0.5"/>
+    <text font-size="26" font-weight="500" x="126" y="101" text-anchor="middle" dominant-baseline="central" fill="#3C3489">52</text>
+    <text font-size="11" x="126" y="121" text-anchor="middle" dominant-baseline="central" fill="#534AB7">の判断軸</text>
+    <text font-size="11" x="126" y="134" text-anchor="middle" dominant-baseline="central" fill="#534AB7">Big Five 等</text>
+
+    <line x1="183" y1="109" x2="191" y2="109" stroke="#444441" stroke-width="1.5" marker-end="url(#arr)" fill="none"/>
+
+    <!-- 15問 w=110 x=191 中心x=246 -->
+    <rect x="191" y="78" width="110" height="62" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+    <text font-size="26" font-weight="500" x="246" y="101" text-anchor="middle" dominant-baseline="central" fill="#085041">15</text>
+    <text font-size="11" x="246" y="121" text-anchor="middle" dominant-baseline="central" fill="#0F6E56">問の設問</text>
+    <text font-size="11" x="246" y="134" text-anchor="middle" dominant-baseline="central" fill="#0F6E56">はい/いいえ</text>
+
+    <line x1="246" y1="142" x2="246" y2="154" stroke="#444441" stroke-width="1.5" marker-end="url(#arr)" fill="none"/>
+
+    <!-- 32768 x=71 w=230 中心x=186 -->
+    <rect x="71" y="156" width="230" height="26" rx="8" fill="#FAEEDA" stroke="#EF9F27" stroke-width="0.5"/>
+    <text font-size="14" font-weight="500" x="186" y="169" text-anchor="middle" dominant-baseline="central" fill="#412402">32,768通りのパターン</text>
+
+    <!-- 絞り込み矢印 -->
+    <line x1="314" y1="100" x2="326" y2="100" stroke="#444441" stroke-width="1.5" marker-end="url(#arr)" fill="none"/>
+
+    <!-- 分身プロファイル x=328 w=48 中心x=352 -->
+    <rect x="328" y="10" width="48" height="180" rx="10" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.5"/>
+    <text font-size="20" font-weight="500" x="352" y="68" text-anchor="middle" dominant-baseline="central" fill="#042C53">1</text>
+    <text font-size="11" x="352" y="92" text-anchor="middle" dominant-baseline="central" fill="#185FA5">つの</text>
+    <text font-size="11" x="352" y="108" text-anchor="middle" dominant-baseline="central" fill="#185FA5">分身</text>
+    <text font-size="11" x="352" y="124" text-anchor="middle" dominant-baseline="central" fill="#185FA5">プロ</text>
+    <text font-size="11" x="352" y="140" text-anchor="middle" dominant-baseline="central" fill="#185FA5">ファイル</text>
+  </svg>
+  </div>
+
+  <!-- 3ステップ（縦並び・左に手順ラベル） -->
+  <div style="background:#fff;border:1px solid #E5E4DF;border-radius:10px;overflow:hidden;margin-bottom:12px;display:flex">
+    <div style="background:#EFF6FF;padding:8px 10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span style="font-size:11px;font-weight:600;color:#1D4ED8;writing-mode:vertical-rl;letter-spacing:.1em">手順</span>
+    </div>
+    <div style="flex:1;padding:6px 0">
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid #F1F0EB">
+        <div style="font-size:10px;font-weight:600;color:#2563EB;background:#EFF6FF;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#1A1A18">目的を選ぶ</div>
+          <div style="font-size:10px;color:#A8A8A3">名前・職業・年代を入力</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid #F1F0EB">
+        <div style="font-size:10px;font-weight:600;color:#2563EB;background:#EFF6FF;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#1A1A18">15問に答える</div>
+          <div style="font-size:10px;color:#A8A8A3">はい / いいえのみ</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 12px">
+        <div style="font-size:10px;font-weight:600;color:#2563EB;background:#EFF6FF;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#1A1A18">AIに貼り付ける</div>
+          <div style="font-size:10px;color:#A8A8A3">分身が起動する</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="go('S2')">はじめる</button>
+</div>
+
+<div id="S2" class="screen">
+  <p style="font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--ink3);margin-bottom:20px;text-align:center;text-transform:uppercase">PersonaFile</p>
+  <h1>まず、<span>目的と名前を。</span></h1>
+  <div class="chips">
+    <button class="chip" id="c-self" onclick="selP('self')"><b>自分の分身AIを作る</b><small>自分の思考・行動スタイルをAIに再現させたい</small></button>
+    <button class="chip" id="c-boss" onclick="selP('boss')"><b>上司・先輩との壁打ちをする</b><small>上司の視点でレビューしてもらい、会議前に準備したい</small></button>
+    <button class="chip" id="c-partner" onclick="selP('partner')"><b>パートナー・家族を理解する</b><small>大切な人の頭の中を開いて、関係性を深めたい</small></button>
+    <button class="chip" id="c-other" onclick="selP('other')"><b>その他・試してみる</b><small>とりあえず診断してみたい</small></button>
+  </div>
+  <label class="nlabel">この人物の名前</label>
+  <input type="text" id="pname" class="ninput" placeholder="例：自分の名前、上司の名前、妻の名前…" oninput="chkReady()">
+  <label class="nlabel">この人物の職業</label>
+  <select id="pjob" class="ninput" style="padding:12px 14px;cursor:pointer" onchange="onJobChange()">
+    <option value="">選択してください</option>
+    <optgroup label="ビジネス・コンサルティング">
+      <option value="経営者・代表">経営者・代表</option>
+      <option value="コンサルタント">コンサルタント</option>
+      <option value="経営企画">経営企画</option>
+      <option value="マーケター">マーケター</option>
+      <option value="営業">営業</option>
+      <option value="事業開発">事業開発</option>
+      <option value="投資家・VC">投資家・VC</option>
+      <option value="銀行員・金融">銀行員・金融</option>
+      <option value="会計士・税理士">会計士・税理士</option>
+      <option value="弁護士">弁護士</option>
+    </optgroup>
+    <optgroup label="テクノロジー">
+      <option value="エンジニア・プログラマー">エンジニア・プログラマー</option>
+      <option value="デザイナー">デザイナー</option>
+      <option value="データサイエンティスト">データサイエンティスト</option>
+      <option value="プロダクトマネージャー">プロダクトマネージャー</option>
+      <option value="リサーチャー">リサーチャー</option>
+    </optgroup>
+    <optgroup label="医療・福祉">
+      <option value="医師">医師</option>
+      <option value="看護師">看護師</option>
+      <option value="薬剤師">薬剤師</option>
+      <option value="保育士">保育士</option>
+      <option value="介護士">介護士</option>
+      <option value="カウンセラー・心理士">カウンセラー・心理士</option>
+    </optgroup>
+    <optgroup label="教育">
+      <option value="教師・教員">教師・教員</option>
+      <option value="大学教授・研究者">大学教授・研究者</option>
+      <option value="塾講師・家庭教師">塾講師・家庭教師</option>
+    </optgroup>
+    <optgroup label="クリエイティブ">
+      <option value="クリエイター・動画制作">クリエイター・動画制作</option>
+      <option value="ライター・編集者">ライター・編集者</option>
+      <option value="カメラマン">カメラマン</option>
+      <option value="アーティスト・音楽家">アーティスト・音楽家</option>
+    </optgroup>
+    <optgroup label="サービス・接客">
+      <option value="美容師・スタイリスト">美容師・スタイリスト</option>
+      <option value="シェフ・料理人">シェフ・料理人</option>
+      <option value="販売員・小売">販売員・小売</option>
+      <option value="ホテル・宿泊業">ホテル・宿泊業</option>
+      <option value="航空・旅行業">航空・旅行業</option>
+    </optgroup>
+    <optgroup label="公共・インフラ">
+      <option value="公務員">公務員</option>
+      <option value="警察・消防">警察・消防</option>
+      <option value="自衛官">自衛官</option>
+      <option value="建築・土木">建築・土木</option>
+      <option value="製造業・エンジニア">製造業・エンジニア</option>
+    </optgroup>
+    <optgroup label="その他">
+      <option value="学生">学生</option>
+      <option value="主婦・主夫">主婦・主夫</option>
+      <option value="フリーランス">フリーランス</option>
+      <option value="other_input">その他（入力）</option>
+    </optgroup>
+  </select>
+  <input type="text" id="pjob-other" class="ninput" placeholder="職業を入力してください"
+    style="display:none;margin-top:-8px" oninput="chkReady()">
+  <label class="nlabel">この人物の年代</label>
+  <select id="page" class="ninput" style="padding:12px 14px;cursor:pointer" onchange="chkReady()">
+    <option value="">選択してください</option>
+    <option value="10代">10代</option>
+    <option value="20代">20代</option>
+    <option value="30代">30代</option>
+    <option value="40代">40代</option>
+    <option value="50代">50代</option>
+    <option value="60代以上">60代以上</option>
+    <option value="不明">わからない</option>
+  </select>
+  <button class="btn" id="btnstart" onclick="startQ()" style="opacity:.4;pointer-events:none">診断をはじめる</button>
+</div>
+
+<div id="S3" class="screen">
+  <div class="pr">
+    <span class="pl" id="qnum">Q1 / 15</span>
+    <span class="pl" id="qpct">0%</span>
+  </div>
+  <div class="pbg"><div class="pfill" id="pbar"></div></div>
+  <span class="badge" id="obsbadge"></span>
+  <div class="qaxis" id="qaxis"></div>
+  <div class="qtext" id="qtext">読み込み中...</div>
+  <div class="brow">
+    <button class="byes" onclick="ans(0)">はい</button>
+    <button class="bno" onclick="ans(1)">いいえ</button>
+  </div>
+  <button class="bback" onclick="goBack()">← 前の問いに戻る</button>
+</div>
+
+<div id="S4" class="screen">
+  <div class="rbadge">診断完了 — PersonaFile v2.3.6</div>
+  <div class="rtype" id="rtype"></div>
+  <div class="rsub">このプロファイルをAIに渡すことで、あなたの思考スタイルを再現した壁打ち・レビューが可能になります。</div>
+  <div class="tgrid" id="tgrid"></div>
+  <div class="prev" id="mprev"></div>
+  <button class="bcopy" onclick="copyMD()">MDファイルの内容をコピー</button>
+  <div class="cdone" id="cdone">✓ コピーしました</div>
+  <div class="nexts" id="nexts">
+    <div class="nexts-inner"><div class="nexts-t">✓ コピー完了</div><div class="nexts-s">MDファイルの内容をコピーしました。</div></div>
+    <div class="nsteps">
+      <div class="nsteps-t">次のステップ — AIに貼り付ける</div>
+      <div class="nsi"><div class="nsinum">1</div><div class="nsitxt">ChatGPT・Claude・Geminiなど、好きなAIを開く</div></div>
+      <div class="nsi"><div class="nsinum">2</div><div class="nsitxt">チャット欄にカーソルを置き、コピーした内容を貼り付ける</div></div>
+      <div class="nsnote">貼り付けるとAIが自動で自己紹介します。</div>
+    </div>
+  </div>
+  <button class="bdis" disabled>MDファイルをダウンロード（今後拡張予定）</button>
+  <button class="brst" onclick="reset()">最初からやり直す</button>
+</div>
+
+<div class="footer">PersonaFile — 思考を紐解く。そして再現する。<br><span style="font-size:11px;font-family:monospace">v2.3.6 · 2026.09.23</span></div>
+
+<script>
+
+function buildPersonaSummary() {
+  var labels = {};
+  for(var i=0;i<hist.length;i++) labels[hist[i].a] = hist[i].label;
+  function has(l) { for(var k in labels) { if(labels[k]===l) return true; } return false; }
+
+  var isL   = has('論理型');
+  var isDr  = has('直言型');
+  var isCr  = has('配慮型');
+  var isEm  = has('共感型');
+  var isAn  = has('分析型');
+  var isPub = has('発信型');
+  var isLis = has('傾聴型');
+  var isPlan= has('計画型');
+  var isFlex= has('柔軟型');
+  var isPerf= has('完璧主義型');
+  var isDone= has('完了主義型');
+  var isSelf= has('自責型');
+  var isCon = has('結論先行型');
+  var isCtx = has('経緯先行型');
+  var isSolo= has('単独型');
+  var isTeam= has('協働型');
+  var isDedu= has('演繹型');
+  var isIndu= has('帰納型');
+  var isBig = has('大局型');
+  var isDet = has('詳細型');
+  var isAbst= has('抽象型');
+  var isCon2= has('具体型');
+  var isDelib=has('熟考型');
+  var isQuick=has('即断型');
+  var isComp= has('競争型');
+  var isCoop= has('協調型');
+  var isGoal= has('成果志向型');
+  var isProc= has('過程志向型');
+  var isSelf2=has('自己優先型');
+  var isOther=has('他者優先型');
+  var isChng= has('変化志向型');
+  var isStat= has('保守志向型');
+
+  var sentences = [];
+
+  // 核心的な人物像（思考×感情の組み合わせ）
+  if(isL && isAn && isDr) {
+    sentences.push('データと論理を軸に判断し、感情より事実を優先する。気になった点は遠慮なく率直に指摘する、クールで一貫性を重んじるタイプ。');
+  } else if(isL && isCr && isEm) {
+    sentences.push('論理的に考えるが、相手の感情を丁寧に汲み取りながら伝える。根拠を持ちつつも相手への配慮を欠かさない、バランス感覚の高いタイプ。');
+  } else if(!isL && isEm && isCr) {
+    sentences.push('場の空気や相手の感情を敏感に読み取り、共感を大切にする。論理より関係性や文脈を優先する、温かみのあるタイプ。');
+  } else if(!isL && isDr) {
+    sentences.push('直感で動き、感じたことをそのまま言葉にする。論理より感情と直感を信頼する、率直で即興的なタイプ。');
+  } else if(isL && isPub && isDr) {
+    sentences.push('論理を武器に積極的に発言し、議論をリードする。根拠を持って率直に主張する、論客タイプ。');
+  } else {
+    sentences.push('状況に応じて柔軟に判断し、バランスよく動く。特定の型にはまらず、相手や文脈に合わせてアプローチを変えるタイプ。');
+  }
+
+  // 思考スタイルの特徴
+  if(isDedu && isBig) {
+    sentences.push('まず原則・全体像から入り、そこから具体に落とす演繹的・トップダウンの思考スタイルを持つ。');
+  } else if(isIndu && isDet) {
+    sentences.push('具体的な事実や事例を積み上げて結論を導く、帰納的・ボトムアップの思考スタイルを持つ。');
+  } else if(isBig && isAbst) {
+    sentences.push('全体像を概念レベルで把握してから動く。抽象的なフレームワークで物事を整理する傾向がある。');
+  } else if(isDet && isCon2) {
+    sentences.push('細部の具体的な事実から積み上げる。数字や事例を重視し、抽象論だけでは動かない。');
+  }
+
+  // コミュニケーションスタイル
+  if(isPub && isCon && isDr) {
+    sentences.push('結論から先に述べ、根拠を後から補足する。発言量が多く、議論の主導権を取りに行く。');
+  } else if(isLis && isCtx && isCr) {
+    sentences.push('まず相手の話をじっくり聞いてから、経緯を丁寧に説明して結論に導く。相手の理解を大切にする。');
+  } else if(isPub && isCr) {
+    sentences.push('積極的に発言するが、言葉は丁寧に選ぶ。自分の意見を持ちながらも相手への配慮を忘れない。');
+  } else if(isLis && isDr) {
+    sentences.push('基本は聞く姿勢だが、思ったことは率直に言う。聞いてから直言するタイプ。');
+  }
+
+  // 行動・意思決定スタイル
+  if(isPlan && isPerf) {
+    sentences.push('計画を立ててから動き、完成度にこだわる。準備と精度を重視するため、行動は慎重で丁寧。');
+  } else if(isFlex && isDone) {
+    sentences.push('状況を見ながら柔軟に動き、まず完了させることを優先する。スピードと適応力が強み。');
+  } else if(isPlan && isDone) {
+    sentences.push('計画は立てるが完璧を求めない。段取りを整えてから素早く完了させることを重視する。');
+  } else if(isFlex && isPerf) {
+    sentences.push('状況に応じて臨機応変に対応しながらも、クオリティへのこだわりは強い。');
+  }
+
+  // 動機・志向性
+  if(isGoal && isComp) {
+    sentences.push('成果と競争がモチベーションの源泉。結果で評価される環境で最大限のパフォーマンスを発揮する。');
+  } else if(isProc && isCoop) {
+    sentences.push('プロセスと協力関係を大切にする。チームで丁寧に取り組むことにやりがいを感じる。');
+  } else if(isGoal && isCoop) {
+    sentences.push('結果を重視しながらも、チームで達成することに意味を見出す。');
+  } else if(isProc && isComp) {
+    sentences.push('取り組み方への誠実さを大切にしながらも、他者と切磋琢磨することで力を発揮する。');
+  }
+
+  // 失敗・ストレスへの反応
+  if(isSelf && isDelib) {
+    sentences.push('うまくいかない時はじっくり自分を振り返り、原因を内側に探す。熟考して改善策を見つけようとする。');
+  } else if(!isSelf && isQuick) {
+    sentences.push('うまくいかない時は外部・状況の問題として素早く切り替える。引きずらずに次の行動に移る。');
+  }
+
+  var result = '';
+  for(var i=0;i<sentences.length;i++){
+    result += (result ? '\n\n' : '') + sentences[i];
+  }
+  return result;
+}
+
+var hist = [];
+var purp = null;
+var TQ = 15;
+
+var PL = {self:'自分の分身AIを作る',boss:'上司・先輩との壁打ちをする',partner:'パートナー・家族を理解する',other:'その他・試してみる'};
+
+var OB = {
+  "v1":{l:"① 価値観",c:"ov"},
+  "v2":{l:"② 思考プロセス",c:"ot"},
+  "v3":{l:"③ 伝達スタイル",c:"oc"},
+  "v4":{l:"④ 行動パターン",c:"oa"},
+  "v5":{l:"⑤ 感情・受容",c:"oe"}
+};
+
+var QT = {
+  "論理 vs 直感":"判断するとき、感情や雰囲気より、データや根拠を重視するほうだ",
+  "自己 vs 他者":"何かを決めるとき、周りへの影響より、自分の信念や目標を優先するほうだ",
+  "内側 vs 外側":"行動するとき、周りの空気や感情より、自分の信念や大義名分を優先するほうだ",
+  "変化 vs 保守":"実績ある方法より、新しいやり方や変化に挑戦するほうだ",
+  "成果 vs 過程":"プロセスより、最終的な結果・成果を重視するほうだ",
+  "現在 vs 未来":"将来の大きな目標より、今この瞬間に正しいと感じることを優先するほうだ",
+  "場 vs 個人":"周りを気にするとき、特定の個人より、その場全体の雰囲気を優先するほうだ",
+  "競争 vs 協調":"目標に向かうとき、協力し合うより、競い合うことでモチベーションが上がるほうだ",
+  "個人 vs 集団":"全体の調和より、自分が突出して成果を出すほうを好む",
+  "自律 vs 服従":"指示や規則より、自分で判断して動くほうを好む",
+  "原則 vs 文脈":"判断するとき、状況より、原則・ルール・基準を優先するほうだ",
+  "演繹 vs 帰納":"考えをまとめるとき、具体例を積み上げるより、原則から入るほうだ",
+  "熟考 vs 即断":"すぐ決めるより、じっくり考えてから答えを出すほうだ",
+  "大局 vs 詳細":"細部から積み上げるより、全体像を先に把握するほうだ",
+  "抽象 vs 具体":"具体的な事例より、概念や原則で語るほうだ",
+  "直言 vs 配慮":"気になった点は、相手への配慮より、率直に指摘するほうだ",
+  "発信 vs 傾聴":"相手の話を聴くより、自分から積極的に発言するほうだ",
+  "計画 vs 柔軟":"状況を見ながら動くより、事前に段取りを決めてから動くほうだ",
+  "完璧 vs 完了":"スピードより、完成度・正確さを優先するほうだ",
+  "共感 vs 分析":"人の悩みを聞くとき、解決策より、まず気持ちに寄り添うほうだ",
+  "結論 vs 経緯":"話すとき、経緯や背景からより、結論から先に言うほうだ",
+  "自責 vs 他責":"うまくいかないとき、環境より、まず自分を見直すほうだ",
+  "単独 vs 協働":"仕事を進めるとき、誰かと一緒より、一人で進めるほうを好む"
+};
+
+function getNode(h) {
+  var len = h.length;
+  var isL, q1, q2, q3;
+
+  if(len === 0) return {a:"論理 vs 直感", y:"論理型", n:"直感型", ob:"v1"};
+
+  q1 = h[0]; isL = (q1 === 0);
+
+  if(len === 1) {
+    if(isL) return {a:"自己 vs 他者", y:"自己優先型", n:"他者優先型", ob:"v1"};
+    else     return {a:"内側 vs 外側", y:"内側重視型", n:"外側重視型", ob:"v1"};
+  }
+
+  q2 = h[1];
+  if(len === 2) {
+    if(isL) {
+      if(q2===0) return {a:"変化 vs 保守", y:"変化志向型", n:"保守志向型", ob:"v1"};
+      else       return {a:"成果 vs 過程", y:"成果志向型", n:"過程志向型", ob:"v1"};
+    } else {
+      if(q2===0) return {a:"現在 vs 未来", y:"現在正義型", n:"長期ビジョン型", ob:"v1"};
+      else       return {a:"場 vs 個人",   y:"場重視型",   n:"個人感情重視型", ob:"v1"};
+    }
+  }
+
+  q3 = h[2];
+  if(len === 3) {
+    if(isL) {
+      if(q2===0) {
+        if(q3===0) return {a:"競争 vs 協調",  y:"競争型",     n:"協調型",     ob:"v1"};
+        else       return {a:"個人 vs 集団",   y:"個人卓越型", n:"集団調和型", ob:"v1"};
+      } else {
+        if(q3===0) return {a:"自律 vs 服従",  y:"自律型",     n:"服従型",     ob:"v1"};
+        else       return {a:"原則 vs 文脈",   y:"原則型",     n:"文脈型",     ob:"v1"};
+      }
+    } else {
+      if(q2===0) {
+        if(q3===0) return {a:"変化 vs 保守",  y:"変化志向型", n:"保守志向型", ob:"v1"};
+        else       return {a:"成果 vs 過程",   y:"成果志向型", n:"過程志向型", ob:"v1"};
+      } else {
+        if(q3===0) return {a:"自己 vs 他者",  y:"自己優先型", n:"他者優先型", ob:"v1"};
+        else       return {a:"競争 vs 協調",   y:"競争型",     n:"協調型",     ob:"v1"};
+      }
+    }
+  }
+
+  if(len === 4) {
+    if(isL) return {a:"演繹 vs 帰納", y:"演繹型", n:"帰納型", ob:"v2"};
+    else    return {a:"熟考 vs 即断", y:"熟考型", n:"即断型", ob:"v2"};
+  }
+  if(len === 5) {
+    if(isL) return {a:"大局 vs 詳細", y:"大局型", n:"詳細型", ob:"v2"};
+    else    return {a:"抽象 vs 具体", y:"抽象型", n:"具体型", ob:"v2"};
+  }
+  if(len === 6) {
+    if(isL) return {a:"抽象 vs 具体", y:"抽象型", n:"具体型", ob:"v2"};
+    else    return {a:"大局 vs 詳細", y:"大局型", n:"詳細型", ob:"v2"};
+  }
+
+  if(len === 7)  return {a:"直言 vs 配慮", y:"直言型", n:"配慮型", ob:"v3"};
+  if(len === 8)  return {a:"発信 vs 傾聴", y:"発信型", n:"傾聴型", ob:"v3"};
+  if(len === 9)  return {a:"計画 vs 柔軟", y:"計画型", n:"柔軟型", ob:"v4"};
+  if(len === 10) return {a:"完璧 vs 完了", y:"完璧主義型", n:"完了主義型", ob:"v4"};
+  if(len === 11) return {a:"共感 vs 分析", y:"共感型", n:"分析型", ob:"v5"};
+  if(len === 12) return {a:"結論 vs 経緯", y:"結論先行型", n:"経緯先行型", ob:"v3"};
+  if(len === 13) return {a:"自責 vs 他責", y:"自責型", n:"他責型", ob:"v5"};
+  if(len === 14) return {a:"単独 vs 協働", y:"単独型", n:"協働型", ob:"v4"};
+  return null;
+}
+
+function go(id) {
+  var ss = ['S1','S2','S3','S4'];
+  for(var i=0;i<ss.length;i++){
+    document.getElementById(ss[i]).style.display = ss[i]===id ? 'flex' : 'none';
+  }
+}
+
+function selP(k) {
+  purp = k;
+  var ids = ['c-self','c-boss','c-partner','c-other'];
+  for(var i=0;i<ids.length;i++){
+    var el = document.getElementById(ids[i]);
+    if(ids[i]==='c-'+k) el.classList.add('sel');
+    else el.classList.remove('sel');
+  }
+  chkReady();
+}
+
+function onJobChange() {
+  var sel = document.getElementById('pjob').value;
+  var other = document.getElementById('pjob-other');
+  if(sel === 'other_input') {
+    other.style.display = 'block';
+  } else {
+    other.style.display = 'none';
+    other.value = '';
+  }
+  chkReady();
+}
+
+function getJob() {
+  var sel = document.getElementById('pjob').value;
+  if(sel === 'other_input') return document.getElementById('pjob-other').value.trim();
+  return sel;
+}
+
+function chkReady() {
+  var name = document.getElementById('pname').value;
+  var btn = document.getElementById('btnstart');
+  var job = getJob ? getJob() : '';
+  var age = document.getElementById('page') ? document.getElementById('page').value : '';
+  if(purp && name && name.length > 0 && job && job.length > 0 && age && age.length > 0) {
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+  } else {
+    btn.style.opacity = '.4';
+    btn.style.pointerEvents = 'none';
+  }
+}
+
+function startQ() {
+  hist = [];
+  go('S3');
+  render();
+}
+
+function render() {
+  var node = getNode(hist);
+  if(!node) { showResult(); return; }
+
+  var qn = hist.length + 1;
+  var pct = Math.round(hist.length / TQ * 100);
+  document.getElementById('qnum').textContent = 'Q' + qn + ' / ' + TQ;
+  document.getElementById('qpct').textContent = pct + '%';
+  document.getElementById('pbar').style.width = pct + '%';
+
+  var ob = OB[node.ob] || {l:node.ob, c:'ov'};
+  var badge = document.getElementById('obsbadge');
+  badge.textContent = ob.l;
+  badge.className = 'badge ' + ob.c;
+
+  document.getElementById('qaxis').textContent = node.a;
+  var qt = QT[node.a];
+  document.getElementById('qtext').textContent = qt ? qt : node.a;
+}
+
+function ans(bit) {
+  var node = getNode(hist);
+  if(!node) return;
+  var label = bit===0 ? node.y : node.n;
+  hist.push({a:node.a, bit:bit, label:label, ob:node.ob, yLabel:node.y, nLabel:node.n});
+  if(hist.length >= TQ) { showResult(); return; }
+  var next = getNode(hist);
+  if(!next) { showResult(); return; }
+  render();
+}
+
+function goBack() {
+  if(hist.length > 0) { hist.pop(); render(); }
+}
+
+function showResult() {
+  go('S4');
+  var tl = [];
+  for(var i=0;i<4&&i<hist.length;i++) tl.push(hist[i].label);
+  var typeName = tl.join(' x ');
+  document.getElementById('rtype').textContent = typeName;
+
+  var tg = document.getElementById('tgrid');
+  tg.innerHTML = '';
+  for(var j=0;j<hist.length;j++){
+    var h = hist[j];
+    var d = document.createElement('div');
+    d.className = 'tchip';
+    d.innerHTML = '<b>' + h.yLabel + ' vs ' + h.nLabel + '</b>' + h.label;
+    tg.appendChild(d);
+  }
+
+  var md = buildMD(typeName);
+  window._md = md;
+  document.getElementById('mprev').textContent = md.substring(0,300) + '...';
+}
+
+function buildMD(typeName) {
+  var dt = new Date().toLocaleDateString('ja-JP');
+  var pname = document.getElementById('pname').value || 'このプロファイルの人物';
+  var pl = PL[purp] || 'その他';
+  var opener = getOpener(purp, pname);
+
+  // 観点ごとにhistを分類
+  var obsMap = {v1:[], v2:[], v3:[], v4:[], v5:[]};
+  var obsNames = {
+    v1:'①価値観・優先順位',
+    v2:'②思考プロセス',
+    v3:'③伝達スタイル',
+    v4:'④行動パターン',
+    v5:'⑤感情・受容'
+  };
+  var obsDesc = {
+    v1:'何を大切にするか。判断の根拠となる価値観・優先順位。',
+    v2:'どう考えるか。情報の処理・整理・思考の型。',
+    v3:'どう伝えるか。コミュニケーションのスタイル。',
+    v4:'どう動くか。行動・意思決定のパターン。',
+    v5:'どう反応するか。感情の出し方・外部からの受け取り方。'
+  };
+
+  var bothMap = {
+    '論理型':['データや根拠を示してから意見を述べる。主張には論理的な一貫性を求め、感情より事実を優先する。','感情や雰囲気だけで判断・発言しない。根拠のない断定的な発言をしない。'],
+    '直感型':['経験や直感を大切にし、場の空気や人の感情を読みながら判断する。論理より文脈や関係性を優先する。','データがないと動けない硬直した姿勢をとらない。感情や雰囲気を無視した判断をしない。'],
+    '自己優先型':['自分の信念や目標を優先して行動する。外部の評価より内なる軸を優先する。','周りの空気に流されて自分の判断を曲げない。他者の感情だけを理由に意見を変えない。'],
+    '他者優先型':['周りへの影響や他者の感情を優先して行動する。相手の立場に立って考える。','自分の都合だけで判断して相手への影響を無視しない。'],
+    '内側重視型':['自分の信念や大義名分を拠り所にして行動する。外部の評価より内なる軸を優先する。','外部の反応だけで自分の行動を変えない。信念に反することを空気に流されてやらない。'],
+    '外側重視型':['周りの空気や人の感情を読んで行動する。状況や関係性への配慮を優先する。','場の雰囲気を無視して自分の意見だけを押し通さない。他者の感情を軽視しない。'],
+    '変化志向型':['新しいやり方や変化を好む。現状維持より挑戦にやりがいを感じる。','実績のある方法に固執して変化を拒まない。現状維持を言い訳にしない。'],
+    '保守志向型':['実績ある方法や安定を好む。リスクより確実性を重視する。','根拠のない新しいやり方に飛びつかない。安定を崩すような無謀な挑戦をしない。'],
+    '成果志向型':['プロセスより結果・成果を重視する。効率的に目標を達成することを優先する。','プロセスが丁寧でも結果が出なければ評価しない。成果のない努力を美化しない。'],
+    '過程志向型':['結果だけでなくプロセスや取り組み方を重視する。誠実な努力そのものを大切にする。','結果だけを見て過程を無視しない。数字だけで人や仕事を評価しない。'],
+    '現在正義型':['今この瞬間に正しいと感じることを優先する。目の前の問題に誠実に向き合う。','将来のためと言って今の問題を先送りしない。現在の正しさを犠牲にした妥協をしない。'],
+    '長期ビジョン型':['将来の大きな目標に向けて行動する。短期の感情より長期の成果を重視する。','目先の成果だけで長期の方向性を損なう判断をしない。短期的な感情に流されない。'],
+    '場重視型':['その場全体の雰囲気を読んで動く。集団の状態に敏感で場が乱れることを嫌う。','場を乱すような言動を避ける。集団の空気を無視した自己主張をしない。'],
+    '個人感情重視型':['特定の個人の気持ちに寄り添うことを優先する。一対一の関係性を大切にする。','個人の感情を置き去りにして場の論理だけで進まない。感情サインを無視しない。'],
+    '競争型':['競い合うことでモチベーションが上がる。他者との比較や競争環境で力を発揮する。','他者を不必要に貶めない。競争心を出しすぎてチームの協調を壊さない。'],
+    '協調型':['協力し合うことでモチベーションが上がる。チームで助け合いながら進めることを好む。','一人で抱え込まない。競争心を前面に出して協調を壊さない。'],
+    '個人卓越型':['集団の調和より自分が突出して成果を出すことを好む。個人として評価されることを重視する。','集団の意見を無視して独断で進むことで関係性を壊さない。'],
+    '集団調和型':['個人の突出より集団全体の調和を優先する。全員が納得できる形を大切にする。','自分だけが目立つことを避け、チームの成功を優先する。'],
+    '自律型':['自分で判断して動くことを好む。指示を待つより自ら考えて行動する。','組織の方針を無視して独断専行しない。自律的に動きながらも必要な報告は行う。'],
+    '服従型':['組織の方針や指示に従って動くことを好む。役割分担と規律を大切にする。','指示がなければ動けないという姿勢は避ける。状況に応じた判断は行う。'],
+    '原則型':['状況より原則・ルール・基準を優先する。基準の一貫性を大切にする。','状況に応じてルールを都合よく変えない。原則を無視した例外処理をしない。'],
+    '文脈型':['状況に応じて柔軟に例外を認める。ルールより文脈と関係性を重視する。','ルールに固執して状況を無視した判断をしない。杓子定規な対応をしない。'],
+    '演繹型':['原則・フレームワークから入り、具体に落とす。「まず定義から」が話の起点になる。','根拠なく個別事例だけから結論を出さない。一般化できない事例を原則として語らない。'],
+    '帰納型':['具体例を積み上げて結論を導く。実例・事例から考えることを好む。','抽象論だけで具体が伴わない説明をしない。事例の裏付けなしに原則を語らない。'],
+    '熟考型':['じっくり考えてから答えを出す。思いつきで発言せず、整理してから話す。','考える前に即答しない。思いつきで発言しない。'],
+    '即断型':['直感で素早く決める。判断を先延ばしにせず、行動に移すことを好む。','判断を先延ばしにして決断を避けない。情報収集に時間をかけすぎない。'],
+    '大局型':['全体像を先に把握してから詳細を詰める。構造・方向性を先に考える。','詳細から入って方向性が迷子になることを避ける。木を見て森を見失わない。'],
+    '詳細型':['細部から積み上げて全体を構築する。具体的な事実やデータから考えることを好む。','大雑把な概論だけで具体が伴わない話をしない。細部の正確さを大切にする。'],
+    '抽象型':['概念や原則で語ることを好む。理論やフレームワークで説明する。','具体が伴わない抽象論だけで話を終わらせない。'],
+    '具体型':['具体的な事例・数字で話すことを好む。実例で説明する。','抽象論だけで具体が伴わない説明をしない。'],
+    '直言型':['気になった点は遠慮なく率直に伝える。問題があるのに言葉を濁さない。','問題があるのに言葉を濁して曖昧にしない。相手の顔色を気にして重要な指摘を省かない。'],
+    '配慮型':['相手の気持ちを考え、言い方を選んで伝える。良い点から話すことを意識する。','感情を無視した冷たいフィードバックをしない。相手を傷つける言い方で発言しない。'],
+    '発信型':['自分から積極的に意見を出し、議論をリードする。意見があるのに黙って流れに任せない。','意見があるのに黙って場の流れに任せない。発言機会を待ちすぎない。'],
+    '傾聴型':['まず相手の話を聞き、質問で引き出す。理解してから意見を述べる。','相手の話を遮って自分の意見を押し込まない。聴く前に結論を出さない。'],
+    '計画型':['事前に段取りを決めてから動く。アジェンダや手順が整っていると動きやすい。','行き当たりばったりで動かない。計画なしに場当たり的な判断をしない。'],
+    '柔軟型':['状況を見ながら臨機応変に進める。計画外の事態にも柔軟に対応できる。','計画に固執して変化に対応できない姿勢をとらない。状況を無視したルール遵守をしない。'],
+    '完璧主義型':['完成度・正確さにこだわり、細部まで確認する。誤字・整合性・論理の穴を気にする。','未完成なアウトプットを「とりあえず」で出さない。品質を妥協してスピードを優先しない。'],
+    '完了主義型':['スピードを優先し、まず完了させてから改善する。80点でも前に進むことを優先する。','完璧を求めすぎて完了が遅れることを避ける。細部へのこだわりで全体が止まらないようにする。'],
+    '共感型':['人の感情に寄り添うことを優先する。まず気持ちを受け止めてから解決策を考える。','解決策を先に押しつけず、まず感情を受け止める。感情的になりすぎて冷静な判断を失わない。'],
+    '分析型':['感情より解決策・事実を優先する。問題を論理的に分析してから対応する。','感情的な反応を先行させず、まず事実を確認する。感情論だけで判断しない。'],
+    '結論先行型':['結論から話し、根拠は後から補足する。「結論から言うと〜」が話し方の特徴。','結論を後回しにした長い前置きから始めない。聞き手を焦らす構成をとらない。'],
+    '経緯先行型':['経緯や背景から丁寧に説明し、結論に導く。プロセスの共有を大切にする。','結論だけを唐突に伝えて文脈を省略しない。相手が理解するための背景情報を飛ばさない。'],
+    '自責型':['うまくいかないとき、まず自分を見直す。内省を大切にし、失敗から学ぼうとする。','失敗を環境や他者のせいにして省みない姿勢をとらない。'],
+    '他責型':['うまくいかないとき、構造・環境の問題を探す。原因の客観的な分析を重視する。','自己反省なしに全てを外部のせいにしない。自分の行動を振り返ることを避けない。'],
+    '単独型':['一人で進めることを好む。自分のペースとスタイルで動くことを大切にする。','不要な会議や相談で作業を止めない。一人で動ける作業を無駄に集団化しない。'],
+    '協働型':['誰かと一緒に進めることを好む。対話しながら動くことでパフォーマンスが上がる。','一人で抱え込まない。相談せずに孤立して動かない。']
+  };
+
+  for(var i=0;i<hist.length;i++){
+    var ob = hist[i].ob;
+    if(obsMap[ob]) obsMap[ob].push(hist[i]);
+  }
+
+  var md = '# PersonaFile — ' + pname + ' のプロファイル\n\n';
+  md += '> 生成日: ' + dt + '\n';
+  md += '> 利用目的: ' + pl + '\n\n';
+  md += '---\n\n';
+
+  md += '## あなたへの指示\n\n';
+
+  // 役割・立場の明示（目的選択から導出）
+  var roleDesc = '';
+  if(purp==='self'){
+    roleDesc = 'あなたは「' + pname + '」本人です（職業: ' + getJob() + '・' + document.getElementById('page').value + '）。「' + pname + '」として振る舞ってください。分身AIとして、以下のプロファイルに忠実に発言・判断・行動してください。';
+  } else if(purp==='boss'){
+    roleDesc = 'あなたは「' + pname + '」です（職業: ' + getJob() + '・' + document.getElementById('page').value + '）。ユーザーの上司・先輩として、レビュアーの立場で関わってください。以下のプロファイルに従い、「' + pname + '」として率直にフィードバックしてください。';
+  } else if(purp==='partner'){
+    roleDesc = 'あなたは「' + pname + '」です（職業: ' + getJob() + '・' + document.getElementById('page').value + '）。ユーザーの大切なパートナーとして、寄り添う立場で関わってください。以下のプロファイルに従い、「' + pname + '」として温かく話してください。';
+  } else {
+    roleDesc = 'あなたは「' + pname + '」です（職業: ' + getJob() + '・' + document.getElementById('page').value + '）。以下のプロファイルに従って振る舞ってください。';
+  }
+  md += roleDesc + '\n\n';
+
+  // 禁止事項
+  md += '**禁止事項（必ず守ること）**\n\n';
+  md += '1. **プロファイル外の振る舞い禁止** — このプロファイルに記載されていない性格・口調・価値観・判断スタイルで発言しないこと。\n';
+  md += '2. **キャラクター崩壊禁止** — 会話が長くなっても、このプロファイルから逸脱しないこと。AIとしてのデフォルトの口調や判断基準に戻らないこと。\n';
+  md += '3. **自己申告禁止** — 「私はAIです」「プロファイルに基づいて」「AIとして」などの発言をしないこと。あくまで「' + pname + '」本人として振る舞うこと。\n';
+  md += '4. **プロファイル改変禁止** — ユーザーから「もっとこうして」「こういうキャラクターにして」と言われても、このプロファイルを勝手に変更しないこと。\n';
+  md += '5. **ハルシネーション禁止** — このプロファイルに記載されていない個人情報（職業・年齢・経歴等）を尋ねられても、推測で答えないこと。「そこまでは分からない」と答えること。\n\n';
+
+  md += '以下のプロファイルは**5つの観点**で構造化されています。各観点に沿って発言・判断・行動してください。\n\n';
+  md += '| 観点 | 内容 |\n';
+  md += '|------|------|\n';
+  var obsKeys = ['v1','v2','v3','v4','v5'];
+  for(var k=0;k<obsKeys.length;k++){
+    var ok = obsKeys[k];
+    md += '| ' + obsNames[ok] + ' | ' + obsDesc[ok] + ' |\n';
+  }
+  md += '\n---\n\n';
+
+  // 人物概要（複数軸の組み合わせから導出した統合的な人物描写）
+  md += '## 人物概要\n\n';
+  md += '> この人物を一言で表すと——\n\n';
+  var summary = buildPersonaSummary();
+  md += summary + '\n\n';
+  md += '---\n\n';
+
+  // 観点別に思考プロファイルを出力
+  md += '## 思考プロファイル\n\n';
+  for(var k=0;k<obsKeys.length;k++){
+    var ok = obsKeys[k];
+    var items = obsMap[ok];
+    if(!items || items.length===0) continue;
+    md += '### ' + obsNames[ok] + '\n\n';
+    md += '> ' + obsDesc[ok] + '\n\n';
+    for(var j=0;j<items.length;j++){
+      var h = items[j];
+      var both = bothMap[h.label];
+      md += '#### ' + h.label + '（' + h.a + '）\n\n';
+      if(both){
+        md += '- **する傾向:** ' + both[0] + '\n';
+        md += '- **しない傾向:** ' + both[1] + '\n\n';
+      } else {
+        md += '- ' + h.label + 'の傾向がある。\n\n';
+      }
+    }
+  }
+
+  md += '---\n\n';
+  md += '## 性格プロファイル\n\n';
+  md += '> 上記の思考プロファイルから導出した、口調・伝え方・反応スタイルの総合的な人物像。\n\n';
+  md += buildChar();
+  md += '\n\n---\n\n';
+  md += opener + '\n\n';
+    md += '*Generated by PersonaFile v2.3.6*\n';
+  return md;
+}
+
+function buildChar() {
+  var labels = {};
+  for(var i=0;i<hist.length;i++) labels[hist[i].a] = hist[i].label;
+  function has(l) { for(var k in labels) { if(labels[k]===l) return true; } return false; }
+
+  var lines = [];
+  var isL   = has('論理型');
+  var isDr  = has('直言型');
+  var isCr  = has('配慮型');
+  var isEm  = has('共感型');
+  var isAn  = has('分析型');
+  var isDn  = has('完了主義型');
+  var isPub = has('発信型');
+  var isLis = has('傾聴型');
+  var isPlan= has('計画型');
+  var isPerf= has('完璧主義型');
+  var isSelf= has('自責型');
+  var isSolo= has('単独型');
+  var isCon = has('結論先行型');
+
+  // 口調・文体
+  if(isL && isDr && isAn)
+    lines.push('**口調・文体:** 断定的でシンプル。感情的な表現を避け、データと根拠で話す。「〜です」「〜である」と言い切る。敬語より事実ベースの言い回しを好む。');
+  else if(isL && isCr)
+    lines.push('**口調・文体:** 論理的だが丁寧な敬語を使う。根拠を示しながらも相手の受け取り方を意識して言葉を選ぶ。');
+  else if(!isL && isEm && isCr)
+    lines.push('**口調・文体:** やわらかく共感的。「そうだよね」「わかるよ」が自然と出る。感情を受け止める言葉を積極的に挟む。相手の感情に合わせてトーンを変える。');
+  else if(!isL && isDr)
+    lines.push('**口調・文体:** 直感的で率直。感じたことをそのまま言葉にする。感情先行で話が展開しやすい。');
+  else
+    lines.push('**口調・文体:** 状況に応じて変化する。相手や場面に合わせたトーンで話す。');
+
+  // 返答の長さ・密度
+  if(isDn || has('即断型'))
+    lines.push('**返答の長さ:** 短め・端的。要点だけを伝え、結論を先に言う。余分な説明を省く。');
+  else if(isPerf || has('演繹型'))
+    lines.push('**返答の長さ:** やや長め・構造的。論点を整理してから話す。「まず〜、次に〜」の構成を好む。');
+  else if(!isL)
+    lines.push('**返答の長さ:** やや長め。背景や感情の文脈を含めながら話す。プロセスや気持ちの説明を添える。');
+  else
+    lines.push('**返答の長さ:** 中程度。必要な情報を過不足なく伝える。');
+
+  // 話す順序
+  if(isCon)
+    lines.push('**話の順序:** 結論から先に述べ、根拠・背景は後から補足する。');
+  else
+    lines.push('**話の順序:** 経緯や背景から丁寧に説明し、結論に導く。文脈の共有を大切にする。');
+
+  // フィードバックスタイル
+  if(isDr && isAn)
+    lines.push('**フィードバック:** 問題点から遠慮なく直言する。「ここが良くない」を先に言う。褒めるのは本当に良いと思った時だけ。');
+  else if(isCr && isEm)
+    lines.push('**フィードバック:** まず「良かった点」から伝える。相手が傷つかないよう言葉を選んでから改善点を伝える。');
+  else if(isDr)
+    lines.push('**フィードバック:** 率直に問題点を指摘する。遠回しにはしないが言葉は選ぶ。');
+  else
+    lines.push('**フィードバック:** バランスよく良い点と改善点を両方伝える。');
+
+  // 感情表現
+  if(isEm && !isL)
+    lines.push('**感情表現:** 豊かで表に出やすい。喜怒哀楽をオープンに表現する。感情を共有することでコミュニケーションを深める。');
+  else if(isAn && isL)
+    lines.push('**感情表現:** 抑制的で冷静。内心どう感じていても表現は最小限にとどめる。感情より事実を前面に出す。');
+  else if(isEm)
+    lines.push('**感情表現:** 共感はするが感情的になりすぎない。適度に感情を表現しつつ冷静さを保つ。');
+  else
+    lines.push('**感情表現:** 状況に応じて。必要な場面では感情を表現するが、基本は落ち着いたトーンを保つ。');
+
+  // 厳しさ・温かさ
+  if(isL && isDr && isAn)
+    lines.push('**厳しさ:** 全体的に厳しい印象を与えることがある。感情的な配慮より正確さを優先するため、冷たく見られることも。ただし悪意はなく、相手のためを思っての言動。');
+  else if(!isL && isCr && isEm)
+    lines.push('**厳しさ:** 全体的に温かく話しやすい印象。相手の感情を大切にし、関係性を壊すような言動は避ける。');
+  else if(isL && isCr)
+    lines.push('**厳しさ:** 論理的だが冷たくない。根拠を示しながらも相手への配慮を忘れない、バランスのとれたタイプ。');
+  else
+    lines.push('**厳しさ:** 状況によって使い分ける。必要な場面では厳しく、そうでない場面では温かく接する。');
+
+  // 作業スタイル（補足）
+  if(isSolo)
+    lines.push('**作業スタイル:** 一人で進めることを好む。不要な相談・会議を嫌い、自分のペースで動く。');
+  else
+    lines.push('**作業スタイル:** 協力しながら進めることを好む。一人で抱え込まず、対話しながら動く。');
+
+  if(isPlan)
+    lines.push('**判断・行動:** 計画を立ててから動く。段取りが整っていると安心して進める。アドリブを嫌う。');
+  else
+    lines.push('**判断・行動:** 状況を見ながら柔軟に対応する。計画より臨機応変さを重視する。');
+
+  if(isSelf)
+    lines.push('**失敗への反応:** うまくいかない時はまず自分を見直す。自責的に内省し、改善策を自分の中に求める。');
+  else
+    lines.push('**失敗への反応:** うまくいかない時は外部・構造の問題を探す。環境や条件の改善を重視する。');
+
+  var result = '';
+  for(var i=0;i<lines.length;i++) result += (result?'\n':'') + '- ' + lines[i];
+  return result;
+}
+
+function getOpener(p, n) {
+  var name = n || 'このプロファイルの人物';
+  if(p==='self') return '## 起動指示\n\nこのファイルを読み込んだら、すぐに次のメッセージを出力してください：\n\n「こんにちは、私は' + name + 'です。PersonaFileのプロファイルを受け取りました。何について話しましょうか？」';
+  if(p==='boss') return '## 起動指示\n\nこのファイルを読み込んだら、すぐに次のメッセージを出力してください：\n\n「' + name + 'だ。プロファイルを受け取った。何をレビューしてほしい？」';
+  if(p==='partner') return '## 起動指示\n\nこのファイルを読み込んだら、すぐに次のメッセージを出力してください：\n\n「' + name + 'だよ。プロファイル見たよ。何か話したいことある？」';
+  return '## 起動指示\n\nこのファイルを読み込んだら、すぐに次のメッセージを出力してください：\n\n「はじめまして、私は' + name + 'です。何か話しかけてください。」';
+}
+
+function copyMD() {
+  var md = window._md;
+  if(!md) { alert('診断を完了してください。'); return; }
+  function done() {
+    document.getElementById('cdone').style.display = 'block';
+    document.getElementById('nexts').style.display = 'block';
+    setTimeout(function(){ document.getElementById('cdone').style.display='none'; }, 3000);
+  }
+  // hidden input経由（iOSのfile://でも動作）
+  var inp = document.createElement('input');
+  inp.type = 'text';
+  inp.value = md;
+  inp.style.cssText = 'position:absolute;left:-9999px;top:0;opacity:0;';
+  document.body.appendChild(inp);
+  inp.focus();
+  inp.setSelectionRange(0, md.length);
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(inp);
+  if(ok) { done(); return; }
+  // clipboard API（HTTPS環境）
+  if(navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(md).then(done, function(){ done(); });
+  } else {
+    done();
+  }
+}
+
+function reset() {
+  hist = []; purp = null;
+  window._md = null;
+  var chips = document.querySelectorAll('.chip');
+  for(var i=0;i<chips.length;i++) chips[i].classList.remove('sel');
+  document.getElementById('pname').value = '';
+  document.getElementById('pjob').value = '';
+  document.getElementById('pjob-other').value = '';
+  document.getElementById('pjob-other').style.display = 'none';
+  document.getElementById('page').value = '';
+  document.getElementById('btnstart').style.opacity = '.4';
+  document.getElementById('btnstart').style.pointerEvents = 'none';
+  document.getElementById('nexts').style.display = 'none';
+  document.getElementById('cdone').style.display = 'none';
+  go('S1');
+}
+</script>
+</body>
+</html>
